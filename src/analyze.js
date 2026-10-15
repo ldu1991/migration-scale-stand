@@ -1,0 +1,11 @@
+const fs = require('fs')
+const path = require('path')
+const { summarize } = require('./stats')
+
+const file = path.resolve(process.argv[2] || path.join(__dirname, '..', 'results', 'runs.jsonl'))
+const lines = fs.readFileSync(file, 'utf8').split('\n').filter(Boolean)
+const runs = lines.map((line) => JSON.parse(line))
+const summary = summarize(runs, { bootstrap: Number(process.env.BOOTSTRAP || 10000) })
+const out = file.replace(/\.jsonl$/, '-summary.json')
+fs.writeFileSync(out, `${JSON.stringify(summary, null, 2)}\n`)
+console.log(`${out}: запусків ${summary.runs}`)

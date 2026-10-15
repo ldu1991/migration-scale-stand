@@ -1,0 +1,7 @@
+FROM node:22.19.0
+WORKDIR /work
+COPY package.json ./
+RUN npm install --omit=dev
+COPY src ./src
+COPY schema ./schema
+CMD ["node", "src/run.js", "--reps", "30"]

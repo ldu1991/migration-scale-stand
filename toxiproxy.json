@@ -1,0 +1,20 @@
+[
+  {
+    "name": "direct",
+    "listen": "0.0.0.0:54320",
+    "upstream": "postgres:5432",
+    "enabled": true
+  },
+  {
+    "name": "session",
+    "listen": "0.0.0.0:54321",
+    "upstream": "pgbouncer-session:5432",
+    "enabled": true
+  },
+  {
+    "name": "transaction",
+    "listen": "0.0.0.0:54322",
+    "upstream": "pgbouncer-transaction:5432",
+    "enabled": true
+  }
+]

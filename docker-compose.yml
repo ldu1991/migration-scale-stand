@@ -1,0 +1,79 @@
+services:
+  postgres:
+    image: postgres:18.3
+    command: ["postgres", "-c", "max_connections=300"]
+    shm_size: 256mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: experiment
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d experiment"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  pgbouncer-session:
+    build:
+      context: .
+      dockerfile: Dockerfile.pgbouncer
+    environment:
+      DB_HOST: postgres
+      DB_NAME: experiment
+      POOL_MODE: session
+      DEFAULT_POOL_SIZE: "64"
+      SERVER_RESET_QUERY_ALWAYS: "0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  pgbouncer-transaction:
+    build:
+      context: .
+      dockerfile: Dockerfile.pgbouncer
+    environment:
+      DB_HOST: postgres
+      DB_NAME: experiment
+      POOL_MODE: transaction
+      DEFAULT_POOL_SIZE: "4"
+      SERVER_RESET_QUERY_ALWAYS: "0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.9.0
+    command: ["-host", "0.0.0.0", "-config", "/toxiproxy.json"]
+    volumes:
+      - ./toxiproxy.json:/toxiproxy.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pgbouncer-session:
+        condition: service_started
+      pgbouncer-transaction:
+        condition: service_started
+
+  runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.runner
+    environment:
+      ADMIN_URL: postgres://postgres@postgres:5432/experiment
+      DIRECT_URL: postgres://postgres@toxiproxy:54320/experiment
+      SESSION_URL: postgres://postgres@toxiproxy:54321/experiment
+      TRANSACTION_URL: postgres://postgres@toxiproxy:54322/experiment
+      TOXIPROXY_API: http://toxiproxy:8474
+      SESSION_POOL_SIZE: "64"
+      TRANSACTION_POOL_SIZE: "4"
+    volumes:
+      - ./src:/work/src
+      - ./schema:/work/schema
+      - ./results:/work/results
+    depends_on:
+      postgres:
+        condition: service_healthy
+      toxiproxy:
+        condition: service_started

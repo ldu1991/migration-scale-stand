@@ -1,0 +1,5 @@
+.idea
+node_modules/
+results/*.json
+results/*.jsonl
+*.log

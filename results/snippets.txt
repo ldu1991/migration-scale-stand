@@ -1,0 +1,5 @@
+INTERVAL '="18"/><w:szCs w:val="18"/></w:rPr><w:t>interval</w:t></w:r><w:proofErr w:type="spellEnd"/><w:r><w:rPr><w:sz w:val="18"/'
+
+UA95 '95 % </w:t></w:r><w:proofErr w:type="spe'
+
+MS 'ка між реплікою і базою. У розгортаннях, де репліки й база розташовані в різних зонах доступності, затримка кожного обміну може становити кілька </w:t></w:r><w:proofErr w:type="spellStart"/><w:r><w:t>мілісекунд</w:t></w:r><w:proofErr w:type'

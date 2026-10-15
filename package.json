@@ -1,0 +1,12 @@
+{
+  "name": "migration-scale-stand",
+  "private": true,
+  "description": "Stand for schema migration time under a transaction advisory lock as session count and latency grow.",
+  "scripts": {
+    "start": "node src/run.js",
+    "check": "node src/self-check.js"
+  },
+  "dependencies": {
+    "pg": "8.23.1"
+  }
+}
